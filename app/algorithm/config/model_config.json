@@ -13,5 +13,5 @@
       "XY_SPLITTER": "xy_splitter"
     }
   },
-  "valid_split": 0.1
+  "valid_split": 0.05
 }

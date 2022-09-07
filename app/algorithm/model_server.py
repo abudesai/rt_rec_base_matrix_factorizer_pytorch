@@ -22,16 +22,16 @@ class ModelServer:
         except: 
             print(f'No preprocessor found to load from {self.model_path}. Did you train the model first?')
         return None
-    
-    
-    def _get_model(self): 
-        try: 
+
+    def _get_model(self):
+        # if self.model is None:
+        try:
             self.model = recommender.load_model(self.model_path)
             return self.model
-        except: 
-            print(f'No model found to load from {self.model_path}. Did you train the model first?')
-        return None
-    
+        except:
+            print(f'Could not load model from {self.model_path}. Did you train the model first?')
+            return None
+
         
     
     def predict(self, data, data_schema):  

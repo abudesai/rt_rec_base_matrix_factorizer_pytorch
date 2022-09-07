@@ -103,23 +103,27 @@ def tune_hyperparameters(data, data_schema, num_trials, hyper_param_path, hpt_re
     hpt_space = get_hpt_space(hpt_specs)  
     default_hps = get_default_hps(hpt_specs) 
 
-    # perform train/valid split on the training data 
-    train_data, valid_data = train_test_split(data, test_size=model_cfg['valid_split'])    
-    train_data, valid_data, _  = model_trainer.preprocess_data(train_data, valid_data, data_schema)   
-    train_X, train_y = train_data['X'], train_data['y'].astype(np.float)
-    valid_X, valid_y = valid_data['X'], valid_data['y'].astype(np.float)          
+            
     
     # Scikit-optimize objective function
     @use_named_args(hpt_space)
     def objective(**hyperparameters):
         """Build a model from this hyper parameter permutation and evaluate its performance"""
+        
+        # perform train/valid split on the training data 
+        train_data, valid_data = train_test_split(data, test_size=model_cfg['valid_split'])    
+        train_data, valid_data, _  = model_trainer.preprocess_data(train_data, valid_data, data_schema)   
+        train_X, train_y = train_data['X'], train_data['y'].astype(np.float)
+        valid_X, valid_y = valid_data['X'], valid_data['y'].astype(np.float)  
+    
         # train model - returns model and history
-        model, _ = model_trainer.train_model(train_X, train_y, hyperparameters, verbose=0) 
+        model, _ = model_trainer.train_model(train_X, train_y, None, None, hyperparameters, verbose=1) 
 
         # evaluate the model
-        score = model.evaluate(valid_X, valid_y)[0]  # model tracks mse and mae. mse is at index 0
+        score = model.evaluate(valid_X, valid_y)  # model tracks mse and mae. mse is at index 0
         # Our optimizing metric is the model loss fn
-        opt_metric = score  # rmse
+        opt_metric = score  # mse
+        
         if np.isnan(opt_metric): opt_metric = 1.0e5     # sometimes loss becomes inf, so use a large value
         # create a unique model name for the trial - we add loss into file name 
         # so we can later sort by file names, and get the best score file without reading each file

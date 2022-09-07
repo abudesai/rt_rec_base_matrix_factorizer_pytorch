@@ -28,7 +28,7 @@ training_path = os.path.join(data_path, channel_name, "recommenderBaseMainInput"
 
 
 
-def tune(num_trials=10):    
+def tune(num_trials=5):    
     try:        
         print('Starting the hyperparameter tuning.')  
         # Read data
@@ -54,7 +54,7 @@ def tune(num_trials=10):
     
 if __name__ == '__main__': 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--num_trials", type=int, default=10, help="the number of trials to run for HPO")
+    parser.add_argument("-n", "--num_trials", type=int, default=5, help="the number of trials to run for HPO")
     args = parser.parse_args()
     
     tune(num_trials=args.num_trials)
