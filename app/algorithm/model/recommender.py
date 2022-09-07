@@ -98,7 +98,6 @@ class Recommender():
                 if verbose == 1 and step % print_every == 0:
                     print(f'Epoch: {e+1}/{epochs}, Step:{step+1}/{Ntrain}; loss: {np.round(current_loss, 5)}')
             
-            print("done epoch")
             if use_early_stopping:
                 # Early stopping
                 if valid_loader is not None: 
@@ -114,7 +113,7 @@ class Recommender():
                         return train_losses
             
                 if verbose == 1:
-                    print(f'Epoch: {e+1}/{epochs}, loss: {np.round(current_loss, 5)}')
+                    print(f'Epoch: {e+1}/{epochs}, final loss: {np.round(current_loss, 5)}')
                     
         return train_losses
     
