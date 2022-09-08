@@ -37,8 +37,7 @@ def get_trained_model(data, data_schema, hyper_params):
     # perform train/valid split 
     train_X, valid_X, train_y, valid_y = train_test_split(X, y, test_size=model_cfg["valid_split"])
     
-    print('train_X/y shape:',  train_X.shape, train_y.shape)
-    # print(train_X.min(), train_X.max()); sys.exit()
+    # print('train_X/y shape:',  train_X.shape, train_y.shape)
               
     # Create and train model     
     print('Fitting model ...')  
