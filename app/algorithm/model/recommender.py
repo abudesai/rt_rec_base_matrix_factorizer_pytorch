@@ -4,6 +4,7 @@ import sys
 import numpy as np, pandas as pd
 import os
 import joblib
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
@@ -56,7 +57,8 @@ class Recommender():
         self.model.to(device)
         # print(self.model.get_num_parameters())
         
-        self.optimizer = optim.Adam(self.model.parameters())
+        # self.optimizer = optim.Adam(self.model.parameters())
+        self.optimizer = optim.SGD(self.model.parameters(), lr=0.08, momentum=0.9)
         self.criterion = nn.MSELoss()
 
 
@@ -75,13 +77,14 @@ class Recommender():
         best_loss = 1e7
         min_epochs = 1
 
-        print_every = 1000  # steps
+        print_every = 100  # steps
         
         train_losses = []
         for e in range(epochs):
             self.model.train()
             Ntrain = len(train_loader)
-            for step, data in enumerate(train_loader):
+            # for step, data in enumerate(train_loader):
+            for data in tqdm(train_loader):
                 x, y = data[0].to(device), data[1].to(device).float()
                 # Make predictions
                 y_hat = self.model(x)
@@ -94,10 +97,7 @@ class Recommender():
                 self.optimizer.step()
 
                 current_loss = loss.item()
-                
-                if verbose == 1 and step % print_every == 0:
-                    print(f'Epoch: {e+1}/{epochs}, Step:{step+1}/{Ntrain}; loss: {np.round(current_loss, 5)}')
-            
+             
             if use_early_stopping:
                 # Early stopping
                 if valid_loader is not None: 
@@ -208,3 +208,34 @@ def load_model(model_path):
 def save_training_history(history, f_path):
     with open(os.path.join(f_path, history_fname), mode='w') as f:
         f.write(json.dumps(history, indent=2))
+
+
+
+if __name__ == "__main__": 
+    N = 5   # num users
+    M = 3   # num items
+    D = 6   # embedding dim
+    K = 4   # num clusters
+    num_samples = 20
+    
+    users = np.random.randint(N, size=num_samples).reshape(-1,1)
+    items = np.random.randint(M, size=num_samples).reshape(-1,1)
+    ratings = np.random.randn(num_samples).reshape(-1,1)
+    
+    R = np.concatenate([users, items, ratings], axis=1)
+    R = np.concatenate([users, items], axis=1)
+    # print(R.shape)
+    
+    model = Recommender(
+        N=N,
+        M=M,
+        K=K,
+        D=D
+    )
+    
+    preds = model.predict(R)
+    
+    print(f"{num_samples=}, {N=}, {M=}, {K=}, {D=}")
+    print(preds.shape)
+    # print(preds[:2])
+    
